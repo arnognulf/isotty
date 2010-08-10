@@ -1,0 +1,10 @@
+.deps
+.libs
+DEADJOE
+Makefile
+Makefile.in
+a.sh
+data
+garmintool
+tmp
+ttyconv

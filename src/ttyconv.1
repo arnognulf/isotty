@@ -1,0 +1,115 @@
+.\"                              hey, Emacs:   -*- nroff -*-
+.\" ttyconv is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; see the file COPYING.  If not, write to
+.\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH TTYCONV 1 "August 29, 2003"
+.\" Please update the above date whenever this man page is modified.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins (default)
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+ttyconv \- Convert a TTY from one encoding to another
+.SH SYNOPSIS
+.B ttyconv
+.RI [-l\ \fIENCODING\fP|--local=\fIENCODING\fP]
+.RI [-r\ \fIENCODING\fP|--remote=\fIENCODING\fP]
+.RI [\fISHELL-COMMAND\fP]
+.br
+.B ttyconv
+.RI [-V]
+.SH DESCRIPTION
+\fBttyconv\fP converts a TTY session from one encoding to another. It
+uses the GNU C Library's
+.BR iconv(3)
+facility. This tool is useful when, for instance, you have a UTF-8
+based system with national language and keyboard support and you still
+want to connect to systems that are unaware of this, or use a
+different (or bizarre) encoding. \fBttyconv\fP is intended as a means
+of easing the transition from `legacy' (sic) applications to ones that
+are fully UTF-8 aware without limiting their output to the US-ASCII
+encoding.
+.PP
+\fBttyconv\fP works by allocating a pseudo-tty, executing the
+specified command on the pty slave (the `remote'), and then translates:
+.PP
+.IP \(bu
+the command's output from the `remote encoding'
+to the `local encoding' and prints it to standard output.
+.IP \(bu
+the user's input from the `local encoding' to
+the `remote encoding' and writes it to the pty's standard input.
+.PP
+\fISHELL-COMMAND\fP is an ordinary shell command. The shell command
+(including any arguments) must appear at the end of the \fBttyconv\fP
+command line. If omitted, the value of the user's \fBSHELL\fP
+environment variable is used to spawn a shell. As a last resort,
+\fB/bin/sh\fP is spawned.
+.SH EXIT STATUS
+An exit status of zero indicates successful termination of the
+translated session. A non-zero exit status denotes abnormal
+termination due to an error that occurred while the terminal
+translation was being set up.
+.SH OPTIONS
+\fBttyconv\fP accepts the following arguments:
+.TP
+.BR  -l ", " --local=\fILOCAL-ENCODING\fP
+Set the local encoding to LOCAL-ENCODING. The encoding must be given
+in a format understood by the \fBiconv(1)\fP utility. Use \fBiconv
+-l\fP for the full list of encodings.  This argument is mandatory.
+.TP
+.BR  -r ", " --remote=\fIREMOTE-ENCODING\fP
+Set the remote encoding to REMOTE-ENCODING. The encoding must be given
+in a format understood by the \fBiconv(1)\fP utility. Use \fBiconv -l\fP for the full list of encodings.
+This argument is mandatory.
+.TP
+.BR  -? ", " --help
+List all available options and their meanings.
+.BR --usage
+Display brief usage information.
+.TP
+.BR  -V ", " --version
+Show the program's version, credits and licensing.
+.SH BUGS
+This is an early version. Bugs are sure to be lurking within.
+.SH RESTRICTIONS
+.PP
+Both translations are handled by calls to \fBlibiconv\fP, and thus
+both forward and inverse conversions must be supported. This is not a
+problem if at one (or both) of the two encodings are flavours of
+Unicode (such as UTF-8). Other combinations of encodings may be a
+different story. Please refer to the \fBiconv(1)\fP man page for more
+details.
+.SH AUTHOR
+Written by Alexios Chouchoulas.
+.SH "REPORTING BUGS"
+Report bugs to Alexios Chouchoulas <alexios@bedroomlan.org>.
+.SH COPYRIGHT
+Copyright \(co 2003 Alexios Chouchoulas <alexios@bedroomlan.org>.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+iconv(1),
+unicode(7),
+utf-8(7).
+\"  LocalWords:  roff nh hy nf fi br sp vv Alexios manpage iconv UTF pty pty's
+\"  LocalWords:  Chouchoulas libiconv unicode utf

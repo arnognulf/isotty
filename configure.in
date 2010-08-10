@@ -1,0 +1,80 @@
+dnl $Id: configure.in,v 1.2 2004/09/07 23:12:51 alexios Exp $
+dnl
+dnl $Log: configure.in,v $
+dnl Revision 1.2  2004/09/07 23:12:51  alexios
+dnl Stepped version to recover CVS repository after near-catastrophic disk
+dnl crash.
+dnl
+dnl Revision 1.2  2004/02/05 14:00:27  alexios
+dnl Removed spec file.
+dnl
+dnl Revision 1.1.1.1  2003/08/29 12:33:18  alexios
+dnl Initial revision.
+dnl
+dnl
+
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/ttyconv.c)
+
+dnl Magic to obtain the version from debian/changelog, where it should
+dnl reside.
+
+ver=`grep urgency= debian/changelog |head -1|sed -e 's/^.*(\(.*\)).*$/\1/'`
+
+dnl Every other copy of the package version number gets its value from
+dnl here (BUT NOT the files in debian/)
+
+AM_INIT_AUTOMAKE(ttyconv, $ver)
+
+dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
+AM_CONFIG_HEADER(config.h)
+
+AC_SUBST(VERSION)
+
+ISODATE=`date +%Y-%m-%d`
+AC_SUBST(ISODATE)
+
+AC_CANONICAL_HOST
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+AC_PROG_CC
+AC_PROG_AWK
+AC_PROG_CPP
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl Check for header files
+AC_PATH_XTRA
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h)
+
+dnl Checks for libraries.
+AC_CHECK_LIB(util, forkpty)
+
+dnl AC_CHECK_LIB(jeeps,GPS_Init,,AC_MSG_ERROR([
+dnl *** We need the Jeeps library (libjeeps).
+dnl *** Please install it and try again.]))
+dnl AC_CHECK_HEADER(jeeps/gps.h,,AC_MSG_ERROR([
+dnl *** We need the include files for the Jeeps library (libjeeps).
+dnl *** Please install it and try again.]))
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h sys/param.h sys/time.h time.h sys/mkdev.h sys/sysmacros.h string.h memory.h fcntl.h dirent.h sys/ndir.h ndir.h alloca.h locale.h )
+
+AC_HEADER_MAJOR
+AC_FUNC_ALLOCA
+AC_STRUCT_TM
+AC_STRUCT_ST_BLOCKS
+AC_FUNC_CLOSEDIR_VOID
+AC_CHECK_HEADER(argp.h,,AC_MSG_ERROR(Cannot continue: argp.h not found))
+    
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+
+AC_OUTPUT(Makefile src/Makefile ttyconv.lsm)
