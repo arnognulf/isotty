@@ -1,0 +1,36 @@
+ttyconv (0.2.3) stable; urgency=low
+
+  * Stepped version to recover CVS repository after near-catastrophic disk
+    crash.
+  * Updated email address.
+  * Updated URL.
+
+ -- Alexios Chouchoulas <alexios@bedroomlan.org>  Wed,  8 Sep 2004 00:16:52 +0100
+
+ttyconv (0.2.2) unstable; urgency=low
+
+  * Various small cleanups and fixes in text files and documentation alike.
+  * Relaxed the dependency on libc a bit.
+  * A small fix in the manpage.
+  * Changed erroneous -D__USE_GNU to -D_GNU_SOURCE to avoid warnings.
+
+ -- Alexios Chouchoulas <alexios@bedroomlan.org>  Thu,  5 Feb 2004 14:52:32 +0000
+
+ttyconv (0.2.1) unstable; urgency=low
+
+  * Bug fixes pertaining to end-of-file detection, and better signal handling.
+
+ -- Alexios Chouchoulas <alexios@bedroomlan.org>  Sat, 27 Sep 2003 13:47:59 +0100
+
+ttyconv (0.2) unstable; urgency=low
+
+  * Improved (read: fixed) support for changing terminal window sizes.
+
+ -- Alexios Chouchoulas <alexios@bedroomlan.org>  Sat, 13 Sep 2003 13:18:07 +0100
+
+ttyconv (0.1) unstable; urgency=low
+
+  * Initial revision.
+
+ -- Alexios Chouchoulas <alexios@bedroomlan.org>  Fri, 29 Aug 2003 14:30:36 +0100
+
