@@ -13,3 +13,9 @@ config.sub
 stamp-h
 ttyconv.lsm
 ttyconv.spec
+pkg/debian/ttyconv
+pkg/debian/manpage.1
+files
+ttyconv.postinst.debhelper
+ttyconv.prerm.debhelper
+ttyconv.substvars

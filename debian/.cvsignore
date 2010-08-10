@@ -1,7 +1,0 @@
-ttyconv
-manpage.1
-files
-ttyconv.postinst.debhelper
-ttyconv.prerm.debhelper
-ttyconv.substvars
-files
