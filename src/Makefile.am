@@ -10,8 +10,8 @@
 #
 
 CFLAGS=-Wall -g -D_GNU_SOURCE
-bin_PROGRAMS=ttyconv
-ttyconv_SOURCES=ttyconv.c ttyconv.h cmdline.c cmdline.h
+bin_PROGRAMS=isotty
+ttyconv_SOURCES=isotty.c isotty.h cmdline.c cmdline.h
 
 #  install the man pages
-man_MANS=ttyconv.1
+man_MANS=isotty.1
