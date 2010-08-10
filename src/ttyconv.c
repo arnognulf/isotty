@@ -66,8 +66,8 @@ typedef struct {
 	char    *readptr;
 	char    *inbuf;
 	char    *outbuf;
-	int     nin;
-	int     nout;
+	size_t     nin;
+	size_t     nout;
 } translate_t;
 
 static translate_t r2l, l2r;
@@ -81,8 +81,7 @@ static int            master;
 	
 
 
-void
-stty_raw (int master)
+void stty_raw (int master)
 {
 	struct termios tty_state;
 	
@@ -137,8 +136,7 @@ void stty_orig (void)
 
 
 
-int
-spawn_command ()
+int spawn_command ()
 {
 	int master;
 
@@ -167,9 +165,7 @@ spawn_command ()
 	return master;
 }
 
-
-int
-open_pty_pair (int *amaster, int *aslave)
+int open_pty_pair (int *amaster, int *aslave)
 {
 	int master, slave;
 	char *name;
@@ -208,8 +204,7 @@ open_pty_pair (int *amaster, int *aslave)
 }
 
 
-void
-iconv_init ()
+void iconv_init ()
 {
 	if ((l2r.iconv = iconv_open (remote,local)) == (iconv_t) -1) {
 		fprintf (stderr,
@@ -230,17 +225,13 @@ iconv_init ()
 	}
 }
 
-
-void
-iconv_done ()
+void iconv_done ()
 {
 	iconv_close (l2r.iconv);
 	iconv_close (r2l.iconv);
 }
 
-
-int
-translate (translate_t * t, int fdin, int fdout)
+int translate (translate_t * t, int fdin, int fdout)
 {
 	int n, e;
 	
@@ -248,42 +239,18 @@ translate (translate_t * t, int fdin, int fdout)
 		n = read (fdin, t->readptr,
 			  sizeof (t->inb) - (t->readptr - t->inb));
 		
-#ifdef DEBUG
-		fprintf (stderr,"READ:   read(fdin, %x, %d) = %d\n",
-			 t->readptr, sizeof (t->inb) - (t->readptr - t->inb), n);
-#endif
-		
 		/* End of file condition */
 		if (n <= 0) return 1;
 		t->readptr += n;
 		t->nin += n;
 		
-#ifdef DEBUG
-		for (n=0; n<sizeof (t->inb); n++) {
-			fprintf(stderr,"%02x ",(unsigned char)t->inb[n]);
-		}
-		fprintf(stderr,"\n");
-#endif
-		
 		t->nout = sizeof (t->outb);
 		
-#ifdef DEBUG
-		fprintf (stderr,"BEFORE: inbuf=%p, nin=%d, outbuf=%p, nout=%d\n",
-			 t->inbuf, t->nin, t->outbuf, t->nout);
-#endif
-				
 	try_again:
-#ifdef DEBUG
-		fprintf(stderr,"ICONV:  iconv (r2l, %x, %d, %x, %d) = ",
-			t->inbuf, t->nin, t->outbuf, t->nout);
-#endif
 		
 		n = iconv (t->iconv, &t->inbuf, &t->nin, &t->outbuf, &t->nout);
 		e = errno;
 		
-#ifdef DEBUG
-		fprintf(stderr,"%d (errno=%d)\n", n, e);
-#endif
 		
 		if (n < 0) {
 			
@@ -291,11 +258,6 @@ translate (translate_t * t, int fdin, int fdout)
 			
 			if (e == EILSEQ) {
 				char q = '?';
-#ifdef DEBUG
-				fprintf(stderr,
-					"illegal sequence at position %d.\n",
-					t->inbuf - t->inb);
-#endif
 				
 				write (fdout, t->outb, sizeof (t->outb) - t->nout);
 				write (fdout, &q, 1);
@@ -313,12 +275,6 @@ translate (translate_t * t, int fdin, int fdout)
 				/* iconv reports an incomplete sequence.  Keep
 				   what we have so far and wait for the rest. */
 				
-#ifdef DEBUG
-				fprintf(stderr,
-					"incomplete sequence at position %d.\n",
-					t->inbuf - t->inb);
-#endif
-				
 				write (fdout, t->outb, sizeof (t->outb) - t->nout);
 				
 				memmove (t->inb, t->inbuf, t->nin);
@@ -332,12 +288,6 @@ translate (translate_t * t, int fdin, int fdout)
 			}
 		} else {
 			write (fdout, t->outb, sizeof (t->outb) - t->nout);
-			
-#ifdef DEBUG
-			fprintf (stderr,
-				 "AFTER:  inbuf=%p, nin=%d, outbuf=%p, nout=%d\n",
-				 t->inbuf, t->nin, t->outbuf, t->nout);
-#endif
 			
 			t->outbuf = t->outb;
 			t->inbuf = t->inb;
@@ -445,17 +395,11 @@ void process (int master)
 
 		/* Received input from the user */
 		if (FD_ISSET (fileno (stdin), &readset)) {
-#ifdef DEBUG
-			fprintf (stderr, "INPUT\n");
-#endif
 			if (translate (&l2r, fileno (stdin), master)) break;
 		}
 
 		/* Received output from the remote end */
 		if (FD_ISSET (master, &readset)) {
-#ifdef DEBUG
-			fprintf (stderr, "OUTPUT\n");
-#endif
 			if (translate (&r2l, master, fileno (stdout))) break;
 		}
 
@@ -467,8 +411,7 @@ void process (int master)
 
 
 
-int
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
 	progname = argv[0];
 	

@@ -59,7 +59,7 @@ static void show_version (FILE *stream, struct argp_state *state);
 
 
 /* The argp functions examine these global variables.  */
-const char *argp_program_bug_address = "<alexios@bedroomlan.org>";
+const char *argp_program_bug_address = "<thomas.eriksson@gmail.com>";
 void (*argp_program_version_hook) (FILE *, struct argp_state *) = show_version;
 
 
@@ -98,25 +98,26 @@ struct argp_option options[] =
 
 
 /* Show the version number and copyright information.  */
-static void
-show_version (FILE *stream, struct argp_state *state)
+static void show_version (FILE *stream, struct argp_state *state) 
 {
 	(void) state;
 	/* Print in small parts whose localizations can hopefully be copied
 	   from other programs.  */
 	fputs(PACKAGE" "VERSION"\n\n", stream);
 	fprintf(stream, 
-		"Written by Alexios Chouchoulas <alexios@bedroomlan.org>.\n"
+		"isotty by Thomas Eriksson <thomas.eriksson@gmail.com>\n"
+		"Based on ttyconv 0.2.3 by Alexios Chouchoulas <alexios@bedroomlan.org>.\n"
+		"Copyright (C) %s %s\n"
 		"Copyright (C) %s %s\n"
 		"This program is free software; you may redistribute it under the terms of\n"
 		"the GNU General Public License.  This program has absolutely no warranty.\n",
+		"2010", "Thomas Eriksson", 
 		"2003", "Alexios Chouchoulas");
 }
 
 
 /* Parse a single option.  */
-static error_t
-parse_opt (int key, char *arg, struct argp_state *state)
+static error_t parse_opt (int key, char *arg, struct argp_state *state)
 {
 	switch (key) {
 	case 'l':			/* --local */
@@ -160,13 +161,15 @@ cmdline_parse (int argc, char ** argv)
 	/* Set up the default command, if one is needed. */
 
 	if (cmdline == NULL) {
-		if ((cmdline = malloc (2 * sizeof (char *))) == NULL) {
+		if (NULL == (cmdline = malloc (2 * sizeof (char *)))) {
 			perror ("malloc()");
 			exit (1);
 		}
 		
 		cmdline [0] = getenv ("SHELL");
-		if (cmdline [0] == NULL) cmdline [0] = strdup("/bin/sh");
+		if (NULL == cmdline [0]) {
+			cmdline [0] = strdup("/bin/sh");
+		}
 		cmdline [1] = NULL;
 
 	}

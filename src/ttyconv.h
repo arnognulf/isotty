@@ -27,8 +27,8 @@ Initial revision.
 */
 
 
-#ifndef __GARMINTOOL_H
-#define __GARMINTOOL_H
+#ifndef _ISOTTY_H
+#define _ISOTTY_H
 
 
 #define EXIT_FAILURE 1
@@ -41,4 +41,4 @@ Initial revision.
 extern char *progname;
 
 
-#endif /* __TTYCONV_H */
+#endif /* _ISOTTY_H */
