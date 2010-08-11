@@ -40,7 +40,7 @@ Initial revision.
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
-#include "ttyconv.h"
+#include "isotty.h"
 #include "config.h"
 
 

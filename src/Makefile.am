@@ -9,9 +9,8 @@
 # Initial revision.
 #
 
-CFLAGS=-Wall -g -D_GNU_SOURCE
 bin_PROGRAMS=isotty
-ttyconv_SOURCES=isotty.c isotty.h cmdline.c cmdline.h
+isotty_SOURCES=isotty.c isotty.h cmdline.c cmdline.h
 
 #  install the man pages
 man_MANS=isotty.1

@@ -1,5 +1,5 @@
 /* 
-   ttyconv.c - Convert TTY connections from one encoding to another.
+   isotty.c - Convert TTY connections from one encoding to another.
 
    Copyright (C) 2003 Alexios Chouchoulas
 
@@ -48,14 +48,11 @@ Initial revision.
 #include <pty.h>
 #include <iconv.h>
 #include "cmdline.h"
-#include "ttyconv.h"
-
-//#define DEBUG
-
+#include "isotty.h"
 
 #define max(a,b) ((a) > (b)? (a): (b))
 
-static char const rcsid[] = "$Id: ttyconv.c,v 1.4 2003/09/27 12:45:35 alexios Exp $";
+static char const rcsid[] = "$Id: isotty.c,v 1.4 2003/09/27 12:45:35 alexios Exp $";
 
 char *progname;
 
@@ -79,8 +76,6 @@ static struct winsize winsize;
 static int            tty_winsize_set = 0;
 static int            master;
 	
-
-
 void stty_raw (int master)
 {
 	struct termios tty_state;
@@ -150,17 +145,10 @@ int spawn_command ()
 	/* This is the child process */
 	
 	if (child_pid == 0) {
-#ifdef DEBUG
-		fprintf(stderr, "*** CMDLINE={\"%s\",\"%s\"}\n", cmdline[0], cmdline[1]);
-#endif
 		execvp (cmdline [0], cmdline);
 		perror ("execvp()");
 		exit(1);
 	}
-
-#ifdef DEBUG	
-	fprintf (stderr, "CHILD PROCESS PID=%d, pid=%d\n", child_pid, getpid());
-#endif
 
 	return master;
 }
@@ -275,19 +263,19 @@ int translate (translate_t * t, int fdin, int fdout)
 				/* iconv reports an incomplete sequence.  Keep
 				   what we have so far and wait for the rest. */
 				
-				write (fdout, t->outb, sizeof (t->outb) - t->nout);
+				write (fdout, t->outb, sizeof(t->outb) - t->nout);
 				
 				memmove (t->inb, t->inbuf, t->nin);
 				t->inbuf = t->inb;
 				t->readptr = t->inb + t->nin;
 				
 				t->outbuf = t->outb;
-				t->nout = sizeof (t->outb);
+				t->nout = sizeof(t->outb);
 				
 				continue;
 			}
 		} else {
-			write (fdout, t->outb, sizeof (t->outb) - t->nout);
+			write (fdout, t->outb, sizeof(t->outb) - t->nout);
 			
 			t->outbuf = t->outb;
 			t->inbuf = t->inb;
@@ -303,7 +291,7 @@ int translate (translate_t * t, int fdin, int fdout)
 
 struct winsize ws, ws0;
 
-void child_winch (int signum)
+void child_winch (int signum, siginfo_t* foo, void* bar)
 {
 	if (ioctl (fileno (stdin), TIOCGWINSZ, &ws0)) return;
 
@@ -339,11 +327,14 @@ void process (int master)
 	/* Set up signal handling */
 
 
-	sigemptyset (&sigmask);
-	sigaddset (&sigmask, SIGWINCH);
-	sigaddset (&sigmask, SIGCHLD);
-	sigaddset (&sigmask, SIGPIPE);
-	sigprocmask (SIG_UNBLOCK, &sigmask, &orig_sigmask);
+	sigemptyset( &sigmask);
+	sigaddset( &sigmask, SIGWINCH);
+	sigaddset( &sigmask, SIGCHLD);
+	sigaddset( &sigmask, SIGPIPE);
+	sigprocmask( SIG_UNBLOCK, &sigmask, &orig_sigmask);
+
+	act.sa_flags = 0;
+	act.sa_mask = sigmask;
 
 	act.sa_handler = child_winch;
 	sigaction (SIGWINCH, &act, NULL);
@@ -394,18 +385,18 @@ void process (int master)
 		if ((sel < 1) && (errno != EINTR) && (errno > 0)) break;
 
 		/* Received input from the user */
-		if (FD_ISSET (fileno (stdin), &readset)) {
+		if (FD_ISSET(fileno(stdin), &readset)) {
 			if (translate (&l2r, fileno (stdin), master)) break;
 		}
 
 		/* Received output from the remote end */
-		if (FD_ISSET (master, &readset)) {
+		if (FD_ISSET(master, &readset)) {
 			if (translate (&r2l, master, fileno (stdout))) break;
 		}
 
 		/* Something nasty happened, terminate */
-		if (FD_ISSET (master, &errset) ||
-		    FD_ISSET (fileno (stdin), &errset)) break;
+		if (FD_ISSET( master, &errset) ||
+		    FD_ISSET( fileno(stdin), &errset)) break;
 	}
 }
 
