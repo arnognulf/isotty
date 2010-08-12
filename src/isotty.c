@@ -49,6 +49,7 @@ Initial revision.
 #include <iconv.h>
 #include "cmdline.h"
 #include "isotty.h"
+#include <stdlib.h>
 
 #define max(a,b) ((a) > (b)? (a): (b))
 
@@ -75,7 +76,8 @@ static int            tty_state_set = 0;
 static struct winsize winsize;
 static int            tty_winsize_set = 0;
 static int            master;
-	
+
+
 void stty_raw (int master)
 {
 	struct termios tty_state;
@@ -333,7 +335,7 @@ void process (int master)
 	sigaddset( &sigmask, SIGPIPE);
 	sigprocmask( SIG_UNBLOCK, &sigmask, &orig_sigmask);
 
-	act.sa_flags = 0;
+	act.sa_flags = SA_NODEFER;
 	act.sa_mask = sigmask;
 
 	act.sa_handler = child_winch;
@@ -400,12 +402,26 @@ void process (int master)
 	}
 }
 
-
+void detect()
+{
+	char detect_magic[] = "\033[30m\033[?25l\r\xc3\xb8\xa5\xc3\x84\xd9\xa7\xd8\xb8\xe0\xe0\xa9\xa9\xb8\x88\xe5\xe5\x88\xa2\xa2\033[D\033[6n\033[40D                                       \033[40D\r\033[?25h"
+	printf("%s", detect_magic);
+	while ( c = getchar()) {
+		;
+	}
+}
 
 int main (int argc, char **argv)
 {
 	progname = argv[0];
+	// detect encoding
+	detect_local(0
+	detect_remote()
+
+	// set environment variables
+
 	
+
 	cmdline_parse (argc, argv);
 	master = spawn_command ();
 	stty_raw (master);
