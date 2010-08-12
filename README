@@ -1,3 +1,9 @@
+This is a fork of ttyconv by Alexious Chochoulas, where I aim to port my shell script wrapper isotty (which kicks serious ass)
+to C.
+more to come!
+
+
+
 			ttyconv - Convert TTY encodings
 
 	   http://www.bedroomlan.org/~alexios/coding_ttyconv.html
