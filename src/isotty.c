@@ -402,25 +402,91 @@ void process (int master)
 	}
 }
 
-void detect()
+#define BUFSZ 256
+char* detect()
 {
-	char detect_magic[] = "\033[30m\033[?25l\r\xc3\xb8\xa5\xc3\x84\xd9\xa7\xd8\xb8\xe0\xe0\xa9\xa9\xb8\x88\xe5\xe5\x88\xa2\xa2\033[D\033[6n\033[40D                                       \033[40D\r\033[?25h"
-	printf("%s", detect_magic);
-	while ( c = getchar()) {
-		;
+	// hide the cursor and try to set the text to invisible since the magic below produces garbage on the screen
+	const char set_invisible[] = "\033[30m\033[?25l\r";
+	// magic string - not to be spoken out loud
+	const char magic[] = "\xc3\xb8\xa5\xc3\x84\xd9\xa7\xd8\xb8\xe0\xe0\xa9\xa9\xb8\x88\xe5\xe5\x88\xa2\xa2";
+	// set the cursor to visible - otherwise the cursor may be away to long and the user may notice
+	const char set_visible[]="\033[D\033[6n\033[40D                                       \033[40D\r\033[?25h";
+	// erase the magic string and restore terminal to sane defaults
+	const char restore[] = "\r\[A\033[20D                    \033[20D\033[0m";
+	char termreply[BUFSZ];
+	int i;
+	FILE* ttydev = 0;
+	
+	// bypass stdout and stderr
+	ttydev = fopen("/dev/tty", "a");
+	if ( NULL == ttydev) {
+		goto exit;
 	}
-}
+	printf("%s", set_invisible, magic, set_invisible);
+	i = 0;
+	while ( c = getchar() && i < 9) {
+		*termreply++;
+		switch (c) {
+			case '\033':;
+			case '0':;
+			case '1':;
+			case '2':;
+			case '3':;
+			case '4':;
+			case '5':;
+			case '6':;
+			case '7':;
+			case '8':;
+			case '9':;
+			case ';': *termreply = c;break;
+			case 'R': *termreply = c; i = 9;break;
+			default: break;
+		}
+	}
 
+	// restore terminal
+	print("%s", restore);
+#if 0
+case "$CURPOS" in
+## UTF-8 detection
+## mlterm: 7
+## xterm: 14
+## gnome-terminal: 13
+*";7R"|*";10R"|*";11R"|*";12R"|*";13R"|*";14R") HOSTENC=UTF-8 ;;
+## legacy korean encoding: CP949 / UHC / JOHAB
+*";18R") HOSTENC=UHC;;
+*";24R") HOSTENC=BIG5;;
+## tested with screen EUC-CN to UTF-8 translation:
+*";16R") HOSTENC=EUC-CN;;
+## following tested with gnome-terminal
+*";21R") HOSTENC=EUC-KR;;
+*";23R") HOSTENC=EUC-JP;;
+*";28R") HOSTENC=EUC-TW;;
+## 8 bit encoding, encoding detection not possible.
+## putty: 17R
+## generic: 20R
+*";17R"|*";20R") : ;;
+*) test "x$DETECTENC" = x1 && STDERR "\
+terminal responded: $CURPOS
+please send this response, along with your host encoding and terminal setup to <arne@users.sourceforge.net>";;
+esac
+#endif // 0
+exit:
+	
+}
+#define LOCALE_NAME_LENGTH 1024
 int main (int argc, char **argv)
 {
 	progname = argv[0];
+	char local_locale[LOCALE_NAME_LENGTH];
+	char remote_locale[LOCALE_NAME_LENGTH];
 	// detect encoding
-	detect_local(0
-	detect_remote()
+	detect_local( &local_locale);
+	detect_remote( &remote_locale, argc, &argv);
 
 	// set environment variables
-
-	
+	//getenv(3)
+	//setenv(3)
 
 	cmdline_parse (argc, argv);
 	master = spawn_command ();
